@@ -4,7 +4,7 @@ import requests
 import re
 
 def gettext(id, title, flag):
-	title = title.replace(' ', '_')
+	title = title.replace('/', '')
 	if flag:
 		page1 = requests.get('http://t.co/%s' % id)
 	else:
