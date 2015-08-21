@@ -3,8 +3,11 @@ import twitter
 import requests
 import re
 
-def gettext(id):
-	page1 = requests.get('http://t.co/%s' % id)
+def gettext(id, flag):
+	if flag:
+		page1 = requests.get('http://t.co/%s' % id)
+	else:
+		page1 = requests.get('http://pastebin.com/%s' % id)
 	t = re.findall('<textarea id=".*?" .*?>(.*?)</textarea>',page1.text,re.S)
 	f = open(id + '.txt','w')
 	if len(t) > 0:
@@ -21,17 +24,25 @@ id1 = tweets[-1].id - 1
 while len(usertimelines) > 0:
 	usertimelines = api.GetUserTimeline(screen_name = 'PastebinLeaks', max_id = id1, count = 200)
 	tweets.extend(usertimelines)
-	id1 = usertimelines[-1].id - 1
+	id1 = tweets[-1].id - 1
+flag = True
 index = 0
 for tweet in tweets:
 	index += 1
 	text = tweet.text
-	s = text.split('http://t.co/')
+	if text.find(' http://t.co/') != -1:
+		s = text.split(' http://t.co/')
+		flag = True
+	elif text.find(' http://pastebin.com/') != -1:
+		s = text.split(' http://pastebin.com/')
+		flag = False
+	else:
+		continue
 	title = s[0]
 	id = s[1]
 	s = id.split(' #')
 	id = s[0]
 	file.write(title + '\t' + id + '\n')
-	#gettext(id)
+	gettext(id, flag)
 print(index)
 file.close()
